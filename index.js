@@ -86,6 +86,31 @@ async function run() {
       res.send(result);
     })
 
+    /*------------- categories --------------- */
+    const categoryCollection = client.db('TechBarik').collection('categories');
+    app.get('/categories', async(req, res) => {
+      const result = await categoryCollection.find().toArray();
+      res.send(result);
+    })
+    app.put('/categories', async(req, res) => {
+      const category = req.body;
+      const options = { upsert: true };
+      const filter = { title: category.title };
+      const newCategory = {
+        $set: {
+          title: category.title
+        }
+      } 
+      const result = await categoryCollection.updateOne(filter, newCategory, options);
+      res.send(result);
+    })
+    app.delete('/categories/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await categoryCollection.deleteOne(query);
+      res.send(result);
+    })
+
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
